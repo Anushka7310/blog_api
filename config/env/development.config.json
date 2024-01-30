@@ -1,0 +1,7 @@
+{
+        "PORT":3000,
+        "MONGO_URI":"mongodb://localhost:27021/blog_api",
+        "SECRET_KEY":"x0n0jQtwGRH470DkqAeRlgsVMlHp0JSv"
+        
+}
+
