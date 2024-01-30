@@ -4,7 +4,7 @@ const authRoutes = require('./routes/auth')
 const {getConfig, getEnvironment} = require("./func");
 require("./common.js");
 
-const config = getConfig(getEnvironment(true), true);
+const config = getConfig(getEnvironment());
 const app = new Koa();
 
 app.use(bodyParser());

@@ -1,6 +1,6 @@
 const {getConfig, getEnvironment} = require("./func");
 
-const config = getConfig(getEnvironment(true), true);
+const config = getConfig(getEnvironment());
 const mongoose = require('mongoose');
 
 mongoose.connect(config.MONGO_URI)
