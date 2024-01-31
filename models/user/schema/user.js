@@ -1,4 +1,4 @@
-const { Schema, default: mongoose } = require("mongoose");
+const { Schema, model } = require("mongoose");
 
 let schema = Schema({
     name: {
@@ -12,4 +12,4 @@ let schema = Schema({
     }
 });
 
-module.exports = mongoose.model("User", schema);
+module.exports = {schema}
