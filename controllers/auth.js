@@ -49,4 +49,4 @@ class AuthController extends Base {
     }
 }
 
-module.exports = { AuthController };
+module.exports = AuthController;

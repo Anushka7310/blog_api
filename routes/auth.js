@@ -1,13 +1,13 @@
 const Router = require("koa-router");
-const authController = require("../controllers/auth")
+const Controller = require("../controllers")
 let r = new Router();
 
 r.post("/register", async (ctx, next) => {
-	let ctr = new authController.AuthController(ctx, next);
+	let ctr = new Controller.Auth(ctx, next);
 	await ctr.executeMethod("register");
 });
 r.post("/login", async (ctx, next) => {
-	let ctr = new authController.AuthController(ctx, next);
+	let ctr = new Controller.Auth(ctx, next);
 	await ctr.executeMethod("login");
 });
 
