@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const Promise = require('bluebird');
 const Registry = require('../misc/registery');
 
 const ERROR_LIST = {
@@ -19,9 +20,10 @@ class Base {
         this._next = _next;
         this.models = Registry.get('models');
         this.schemas = Registry.get('schemas');
-        this.env = Registry.get("env");
+        this.config = Registry.get("config");
         this._beforeMethods = {};
         this._afterMethods = {};
+
     }
 
     throwError(code, message = null, details = null) {

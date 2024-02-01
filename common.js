@@ -6,7 +6,7 @@ const _ = require('lodash');
 // Other imports and configurations
 const { getConfig, getEnvironment, connectMongo } = require("./func");
 const config = getConfig(getEnvironment());
-
+Registry.set("config", config);
 // Initializing default (Primary) mongodb and initializing models
 const defaultMongodbClient = connectMongo("DefaultDbClient", config.storageDatabases.primary, true);
 // Set default models
