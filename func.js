@@ -14,7 +14,8 @@ function getConfig(env = "development") {
 function connectMongo(name, config, set = false) {
 	let dbConn = (new MongoDbClient(config)).createConnection({
 		useUnifiedTopology: true,
-		useCreateIndex: true
+		useCreateIndex: true,
+		useFindAndModify: false
 	});
 	if (set) {
 		Registry.set(name, dbConn);

@@ -5,17 +5,21 @@ r.post("/blog", async (ctx, next) => {
 	let ctr = new Controller.Blog(ctx, next);
 	await ctr.executeMethod("createBlog");
 });
-r.get("/blog/:blogid", ctx => {
-    ctx.body = 'Hello World';
+r.get("/blog/:blogid", async (ctx, next) => {
+	let ctr = new Controller.Blog(ctx, next);
+	await ctr.executeMethod("getBlog");
 });
-r.get("/blogs", ctx => {
-    ctx.body = 'Hello World';
+r.get("/blogs",  async (ctx, next) => {
+	let ctr = new Controller.Blog(ctx, next);
+	await ctr.executeMethod("getAllBlogs");
 });
-r.put("/blog/:blogid", ctx => {
-    ctx.body = 'Hello World';
+r.put("/blog/:blogid", async (ctx, next) => {
+	let ctr = new Controller.Blog(ctx, next);
+	await ctr.executeMethod("updateBlog");
 });
-r.delete("/blog/:blogid", ctx => {
-    ctx.body = 'Hello World';
+r.delete("/blog/:blogid",async (ctx, next) => {
+	let ctr = new Controller.Blog(ctx, next);
+	await ctr.executeMethod("deleteBlog");
 });
 
 module.exports = r;
