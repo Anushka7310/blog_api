@@ -1,4 +1,5 @@
 module.exports = {
     Auth: require("./auth"),
-    Blog: require("./blog")
+    Blog: require("./blog"),
+    User: require("./user")
 }

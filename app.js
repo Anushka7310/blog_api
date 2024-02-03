@@ -2,6 +2,7 @@ const Koa = require('koa');
 const bodyParser = require('koa-bodyparser')
 const authRoutes = require('./routes/auth')
 const blogRoutes = require('./routes/blog.js')
+const userRoutes = require("./routes/user.js")
 const {getConfig, getEnvironment} = require("./func");
 require("./common.js");
 
@@ -11,6 +12,7 @@ const app = new Koa();
 app.use(bodyParser());
 app.use(authRoutes.routes()).use(authRoutes.allowedMethods());
 app.use(blogRoutes.routes()).use(blogRoutes.allowedMethods());
+app.use(userRoutes.routes()).use(userRoutes.allowedMethods());
 app.listen(config.PORT, () => {
   console.log(`Server is running on port ${config.PORT}`);
 });
