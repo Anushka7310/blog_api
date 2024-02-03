@@ -72,9 +72,12 @@ class BlogController extends Auth {
 
     async getAllBlogs() {
         try {
-            const blogs = await this.models.Blog.find();
-            if (!blogs) {
-                throw new Error("Blog not found");
+            const page = parseInt(this.ctx.query.page) || 1;
+            const limit = parseInt(this.ctx.query.limit) || 10;
+            const skip = (page - 1) * limit;
+            const blogs = await this.models.Blog.find().skip(skip).limit(limit);
+            if(!blogs || blogs.length === 0){
+                throw new Error("No blogs found for the specified page");
             }
             this.ctx.body = { status: "Success", blogs };
         } catch (error) {
