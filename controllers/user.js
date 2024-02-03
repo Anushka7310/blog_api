@@ -1,6 +1,7 @@
 const Auth = require("./auth");
 const Validation = require("../validations");
-
+const { hash, compare } = require('bcrypt');
+const _ = require("lodash")
 
 class UserController extends Auth {
     constructor(ctx, _next){
@@ -24,12 +25,15 @@ class UserController extends Auth {
         async updateUser(){
             try {
                 const ctxBody = await Validation.User.userSchema.validateAsync(this.ctx.request.body);
-                const updatedUser = await this.models.User.findByIdAndUpdate(
-                this.user._id,
-                { $set: { name: ctxBody.name, password: ctxBody.password} },
-                { new: true }
-                );
-                this.ctx.body = { status: "Success", updatedUser };
+                if(_.size(ctxBody.name)){
+                    this.user.name = ctxBody.name
+                }
+                if(_.size(ctxBody.password)){
+                    const hashedPassword = await hash(ctxBody.password, 10)
+                    this.user.password = hashedPassword;
+                }
+                await this.user.save();
+                this.ctx.body = { status: "Success"};
             } catch (error) {
                 this.ctx.status = 400;
                 this.ctx.body = { error: error.message };

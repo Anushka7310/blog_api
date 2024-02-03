@@ -41,15 +41,11 @@ class BlogController extends Auth {
             if (!blog.author.equals(this.user._id)) {
                 throw new Error("You are not authorized to update this blog");
             }
-            const updatedBlog = await this.models.Blog.findByIdAndUpdate(
-                blogId,
-                { $set: { title: ctxBody.title, content: ctxBody.content, author: this.user._id } },
-                { new: true }
-            );
-            if (!updatedBlog) {
-                throw new Error("Blog not found");
-            }
-            this.ctx.body = { status: "Success", updatedBlog };
+
+            blog.title = ctxBody.title;
+            blog.content = ctxBody.content
+            await blog.save();
+            this.ctx.body = { status: "Success", blog };
         } catch (error) {
             this.ctx.status = 400;
             this.ctx.body = { error: error.message };
