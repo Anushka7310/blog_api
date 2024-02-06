@@ -20,7 +20,6 @@ class AuthController extends Base {
             let user = await this.models.User.findOne({ _id: payload.id });
             this.user = user;
         } catch (error) {
-            console.log(error);
             this.throwError("102", "Authentication token expired, Please re-login to continue using the dashboard");
         }
         
@@ -49,12 +48,10 @@ class AuthController extends Base {
         try {
             const ctxBody = await Validation.Auth.loginSchema.validateAsync(this.ctx.request.body);
             const user = await this.models.User.findOne({ email: ctxBody.email })
-            console.log(user);
             if (!user) {
                 this.ctx.throw(401, "Invalid username or password");
             }
             const validPassword = await compare(ctxBody.password, user.password)
-            console.log(validPassword);
             if (!validPassword) {
                 this.ctx.throw(401, "Invalid username or password");
             }

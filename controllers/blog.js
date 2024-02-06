@@ -14,90 +14,87 @@ class BlogController extends Auth {
     }
 
     async createBlog() {
-        try {
-            console.log(this.user);
-            const ctxBody = await Validation.Blog.blogSchema.validateAsync(this.ctx.request.body);
+        const ctxBody = await Validation.Blog.blogSchema.validate(this.ctx.request.body);
             const newBlog = new this.models.Blog({
                 title: ctxBody.title,
                 content: ctxBody.content,
                 author: this.user._id
             });
             await newBlog.save();
-            this.ctx.body = { status: "Success", newBlog };
-        } catch (error) {
-            this.ctx.status = 400;
-            this.ctx.body = { error: error.message };
-        }
+            this.ctx.body = { 
+                success: true,
+                message: "Blog created successfully",
+                 data: {
+                    blog: newBlog
+                } 
+            };
     }
 
-    async updateBlog() {
-        try {
-            const blogId = this.ctx.params.blogid;
-            const ctxBody = await Validation.Blog.blogSchema.validateAsync(this.ctx.request.body);
-            const blog = await this.models.Blog.findById(blogId);
-            if (!blog) {
-                throw new Error("Blog not found");
-            }
-            if (!blog.author.equals(this.user._id)) {
-                throw new Error("You are not authorized to update this blog");
-            }
-
-            blog.title = ctxBody.title;
-            blog.content = ctxBody.content
-            await blog.save();
-            this.ctx.body = { status: "Success", blog };
-        } catch (error) {
-            this.ctx.status = 400;
-            this.ctx.body = { error: error.message };
+    async updateBlog(blogId) {
+        const ctxBody = await Validation.Blog.blogSchema.validate(this.ctx.request.body);
+        const blog = await this.models.Blog.findOne({_id: blogId});
+        if (!blog) {
+            this.throwError("404", "Invalid Blog ID");
         }
+        if (!blog.author.equals(this.user._id)) {
+            this.throwError("401", "You are not authorized to update this blog");
+        }
+        blog.title = ctxBody.title;
+        blog.content = ctxBody.content
+        await blog.save();
+        this.ctx.body = {
+             success: true, 
+             message: "Blog updated successfully",
+              data: {
+                blog
+              } 
+            };
     }
 
-    async getBlog() {
-        try {
-            const blogId = this.ctx.params.blogid;
-            const blog = await this.models.Blog.findById(blogId);
-            if (!blog) {
-                throw new Error("Blog not found");
-            }
-            this.ctx.body = { status: "Success", blog };
-        } catch (error) {
-            this.ctx.status = 400;
-            this.ctx.body = { error: error.message };
+    async getBlog(blogId) {
+        const blog = await this.models.Blog.findOne({_id: blogId});
+        if (!blog) {
+            this.throwError("404", "Invalid Blog ID");
         }
+        this.ctx.body = { 
+            success: true,
+            data : {
+                blog
+            } 
+            };
     }
 
     async getAllBlogs() {
-        try {
-            const page = parseInt(this.ctx.query.page) || 1;
-            const limit = parseInt(this.ctx.query.limit) || 10;
-            const skip = (page - 1) * limit;
-            const blogs = await this.models.Blog.find().skip(skip).limit(limit);
-            if(!blogs || blogs.length === 0){
-                throw new Error("No blogs found for the specified page");
-            }
-            this.ctx.body = { status: "Success", blogs };
-        } catch (error) {
-            this.ctx.status = 400;
-            this.ctx.body = { error: error.message };
-        }
+        const page = _.parseInt(this.ctx.query.page || 1),
+			limit = _.parseInt(this.ctx.query.limit || 100),
+			skip = (page - 1) * limit;
+
+        const blogs = await this.models.Blog.find().skip(skip).sort({ created: -1 }).limit(limit).maxTimeMS(10000);
+        const total = await this.models.Blog.countDocuments().maxTimeMS(10000);
+        this.ctx.body = {
+             success: true,
+              data: {
+                blogs,
+                pagination: {
+					page, limit, total, count: total
+				},
+              } 
+            };
     }
 
-    async deleteBlog() {
-        try {
-            const blogId = this.ctx.params.blogid;
-            const blog = await this.models.Blog.findById(blogId);
-            if (!blog) {
-                throw new Error("Blog not found");
-            }
-            if (!blog.author.equals(this.user._id)) {
-                throw new Error("You are not authorized to update this blog");
-            }
-            await blog.remove()
-            this.ctx.body = { status: "Success", message: "Blog deleted successfully" };
-        } catch (error) {
-            this.ctx.status = 400;
-            this.ctx.body = { error: error.message };
+    async deleteBlog(blogId) {
+        const blog = await this.models.Blog.findOne({_id:   blogId});
+        if (!blog) {
+            this.throwError("404", "Invalid Blog ID");
         }
+        if (!blog.author.equals(this.user._id)) {
+            this.throwError("401", "You are not authorized to update this blog");
+        }
+        await blog.remove()
+        this.ctx.body = { 
+            success: true,
+            message: "Blog deleted successfully"
+        };
     }
 }
 

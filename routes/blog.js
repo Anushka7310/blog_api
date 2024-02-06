@@ -7,7 +7,7 @@ r.post("/blog", async (ctx, next) => {
 });
 r.get("/blog/:blogid", async (ctx, next) => {
 	let ctr = new Controller.Blog(ctx, next);
-	await ctr.executeMethod("getBlog");
+	await ctr.executeMethod("getBlog", ctx.params.blogid);
 });
 r.get("/blogs",  async (ctx, next) => {
 	let ctr = new Controller.Blog(ctx, next);
@@ -15,11 +15,11 @@ r.get("/blogs",  async (ctx, next) => {
 });
 r.put("/blog/:blogid", async (ctx, next) => {
 	let ctr = new Controller.Blog(ctx, next);
-	await ctr.executeMethod("updateBlog");
+	await ctr.executeMethod("updateBlog", ctx.params.blogid);
 });
 r.delete("/blog/:blogid",async (ctx, next) => {
 	let ctr = new Controller.Blog(ctx, next);
-	await ctr.executeMethod("deleteBlog");
+	await ctr.executeMethod("deleteBlog", ctx.params.blogid);
 });
 
 module.exports = r;

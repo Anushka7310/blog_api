@@ -1,6 +1,15 @@
 {
     "PORT":3000,
     "MONGO_URI":"",
-    "SECRET_KEY":""
-    
+    "SECRET_KEY":"",
+    "storageDatabases": {
+		"primary": {
+			"connect": "",
+			"db": "",
+			"host": "",
+			"user": "",
+			"pass": "",
+			"options": ""
+	        }
+        }
 }

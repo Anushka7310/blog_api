@@ -8,6 +8,7 @@ let schema = Schema({
     password: {
         type: String,
         required: true,
+        bcrypt: true
     },
     email: {
         type: String,
@@ -15,5 +16,6 @@ let schema = Schema({
 		unique: true,
     }
 });
+schema.plugin(require('mongoose-bcrypt'));
 
 module.exports = {schema}
