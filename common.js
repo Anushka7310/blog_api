@@ -1,5 +1,5 @@
 // Importing the Registry instance
-const Registry = require("./misc/registery");
+const Registry = require("./misc/registry");
 const _ = require('lodash');
 
 

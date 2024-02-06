@@ -1,5 +1,6 @@
 const Auth = require("./auth");
 const Validation = require("../validations");
+const _ = require("lodash");
 
 class BlogController extends Auth {
     constructor(ctx, _next) {
@@ -14,10 +15,14 @@ class BlogController extends Auth {
     }
 
     async createBlog() {
-        const ctxBody = await Validation.Blog.blogSchema.validate(this.ctx.request.body);
+        const {error, value} = Validation.Blog.blogSchema.validate(this.ctx.request.body);
+        if (error) {
+			let errorMessage = _.size(error.details) > 0 ? error.details[0].message : null;
+			this.throwError("201", errorMessage);
+		}
             const newBlog = new this.models.Blog({
-                title: ctxBody.title,
-                content: ctxBody.content,
+                title: value.title,
+                content: value.content,
                 author: this.user._id
             });
             await newBlog.save();
@@ -31,7 +36,11 @@ class BlogController extends Auth {
     }
 
     async updateBlog(blogId) {
-        const ctxBody = await Validation.Blog.blogSchema.validate(this.ctx.request.body);
+        const {error, value} = Validation.Blog.blogSchema.validate(this.ctx.request.body);
+        if (error) {
+			let errorMessage = _.size(error.details) > 0 ? error.details[0].message : null;
+			this.throwError("201", errorMessage);
+		}
         const blog = await this.models.Blog.findOne({_id: blogId});
         if (!blog) {
             this.throwError("404", "Invalid Blog ID");
@@ -39,8 +48,8 @@ class BlogController extends Auth {
         if (!blog.author.equals(this.user._id)) {
             this.throwError("401", "You are not authorized to update this blog");
         }
-        blog.title = ctxBody.title;
-        blog.content = ctxBody.content
+        blog.title = value.title;
+        blog.content = value.content
         await blog.save();
         this.ctx.body = {
              success: true, 
@@ -76,7 +85,7 @@ class BlogController extends Auth {
               data: {
                 blogs,
                 pagination: {
-					page, limit, total, count: total
+					page, limit, total, count: blogs.length
 				},
               } 
             };

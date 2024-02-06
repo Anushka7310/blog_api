@@ -10,34 +10,28 @@ class UserController extends Auth {
             "getUser": ["_secure"],
             "updateUser": ["_secure"]
         }
-        }
-        async getUser() {
-            try {
-                const userWithoutPassword = { ...this.user.toObject() };
-                delete userWithoutPassword.password;
-                this.ctx.body = { status: "Success", user: userWithoutPassword };
-            } catch (error) {
-                this.ctx.status = 500;
-                this.ctx.body = { error: "Internal Server Error" };
-            }
-        }        
+    }
 
-        async updateUser(){
-            try {
-                const ctxBody = await Validation.User.userSchema.validateAsync(this.ctx.request.body);
-                if(_.size(ctxBody.name)){
-                    this.user.name = ctxBody.name
-                }
-                if(_.size(ctxBody.password)){
-                    const hashedPassword = await hash(ctxBody.password, 10)
-                    this.user.password = hashedPassword;
-                }
-                await this.user.save();
-                this.ctx.body = { status: "Success"};
-            } catch (error) {
-                this.ctx.status = 400;
-                this.ctx.body = { error: error.message };
-            }
+    async getUser() {
+        const userWithoutPassword = { ...this.user.toObject() };
+        delete userWithoutPassword.password;
+        this.ctx.body = { success: true, user: userWithoutPassword };
+    }        
+
+    async updateUser(){
+        const {error, value} = await Validation.User.userSchema.validate(this.ctx.request.body);
+        if (error) {
+			let errorMessage = _.size(error.details) > 0 ? error.details[0].message : null;
+			this.throwError("201", errorMessage);
+		}
+        if(_.size(value.name)){
+            this.user.name = value.name
         }
+        if(_.size(value.password)){
+            this.user.password = value.password;
+        }
+        await this.user.save();
+        this.ctx.body = { success: true, message: "User updated successfully"};
+    }
 }
 module.exports = UserController;

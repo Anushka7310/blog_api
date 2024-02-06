@@ -1,7 +1,8 @@
 const { Base } = require('./base');
 const jwt = require('jsonwebtoken');
+const _ = require("lodash");
 
-const { hash, compare } = require('bcrypt');
+const { compare } = require('bcrypt');
 const generateToken = require("../services/auth")
 const Validation = require("../validations")
 
@@ -27,40 +28,37 @@ class AuthController extends Base {
 
 
     async register() {
-        try {
-            const ctxBody = await Validation.Auth.registerSchema.validateAsync(this.ctx.request.body);
-            const user = await this.models.User.findOne({ email: ctxBody.email })
-            if (user) {
-                this.ctx.throw(400, "Email already exists");
-            }
-            const hashedPassword = await hash(ctxBody.password, 10);
-            const newUser = new this.models.User({ email: ctxBody.email, password: hashedPassword, name: ctxBody.name });
-            await newUser.save();
-            const token = generateToken(newUser);
-            this.ctx.body = { status: "success", token };
-        } catch (error) {
-            this.ctx.status = 400;
-            this.ctx.body = { error: error.message };
+        const {error, value} = await Validation.Auth.registerSchema.validate(this.ctx.request.body);
+        if (error) {
+			let errorMessage = _.size(error.details) > 0 ? error.details[0].message : null;
+			this.throwError("201", errorMessage);
+		}
+        const user = await this.models.User.findOne({ email: value.email })
+        if (user) {
+            this.throwError("400", "Email already exists");
         }
+        const newUser = new this.models.User({ email: value.email, password: value.password, name: value.name });
+        await newUser.save();
+        const token = generateToken(newUser);
+        this.ctx.body = { success: true, data: {token} };
     }
 
     async login() {
-        try {
-            const ctxBody = await Validation.Auth.loginSchema.validateAsync(this.ctx.request.body);
-            const user = await this.models.User.findOne({ email: ctxBody.email })
-            if (!user) {
-                this.ctx.throw(401, "Invalid username or password");
-            }
-            const validPassword = await compare(ctxBody.password, user.password)
-            if (!validPassword) {
-                this.ctx.throw(401, "Invalid username or password");
-            }
-            const token = generateToken(user);
-            this.ctx.body = { status: "success", token };
-        } catch (error) {
-            this.ctx.status = 400;
-            this.ctx.body = { error: error.message };
+        const {error, value} = await Validation.Auth.loginSchema.validate(this.ctx.request.body);
+        if (error) {
+			let errorMessage = _.size(error.details) > 0 ? error.details[0].message : null;
+			this.throwError("201", errorMessage);
+		}
+        const user = await this.models.User.findOne({ email: value.email })
+        if (!user) {
+            this.throwError("401", "Invalid username or password");
         }
+        const validPassword = await compare(value.password, user.password)
+        if (!validPassword) {
+            this.ctx.throw("401", "Invalid username or password");
+        }
+        const token = generateToken(user);
+        this.ctx.body = { success: true, data: {token} };
     }
 }
 

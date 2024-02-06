@@ -1,5 +1,5 @@
 const MongoDbClient = require("./misc/db/client/mongodb");
-const Registry = require("./misc/registery");
+const Registry = require("./misc/registry");
 
 function getEnvironment() {
 	const env = process.env.NODE_ENV || 'development';

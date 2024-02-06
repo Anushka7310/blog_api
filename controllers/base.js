@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
-const Registry = require('../misc/registery');
+const Registry = require('../misc/registry');
 
 const ERROR_LIST = {
     "101": {statusCode: 400, errorCode: "101", codeMsg: "API_KEY_MISSING", message: "Api Key not found in authentication header or query string"},
