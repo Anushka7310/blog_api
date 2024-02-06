@@ -74,18 +74,25 @@ class BlogController extends Auth {
     }
 
     async getAllBlogs() {
+        let filterQuery = { };
+		if (this.ctx.query["title"] && _.size(this.ctx.query["title"]) > 0) {
+			filterQuery["title"] = { $regex: this.ctx.query["title"], $options: 'i' };
+		}
+		if (this.ctx.query["content"] && _.size(this.ctx.query["content"]) > 0) {
+			filterQuery["content"] = { $regex: this.ctx.query["content"], $options: 'i' };
+		}
         const page = _.parseInt(this.ctx.query.page || 1),
 			limit = _.parseInt(this.ctx.query.limit || 100),
 			skip = (page - 1) * limit;
-
-        const blogs = await this.models.Blog.find().skip(skip).sort({ created: -1 }).limit(limit).maxTimeMS(10000);
+        const blogs = await this.models.Blog.find(filterQuery).skip(skip).sort({ created: -1 }).limit(limit).maxTimeMS(10000);
+        const count = await this.models.Blog.countDocuments(filterQuery).maxTimeMS(10000);
         const total = await this.models.Blog.countDocuments().maxTimeMS(10000);
         this.ctx.body = {
              success: true,
               data: {
                 blogs,
                 pagination: {
-					page, limit, total, count: blogs.length
+					page, limit, total, count
 				},
               } 
             };
